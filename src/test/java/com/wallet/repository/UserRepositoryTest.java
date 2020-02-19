@@ -1,21 +1,18 @@
 package com.wallet.repository;
 
 import com.wallet.entity.User;
-import org.junit.After;
-import org.junit.Before;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@RunWith(SpringRunner.class)
 @SpringBootTest
 public class UserRepositoryTest {
     public static final String EMAIL = "email@teste.com";
@@ -25,7 +22,7 @@ public class UserRepositoryTest {
     @Autowired
     UserRepository repository;
 
-    @Before
+    @BeforeEach
     public void setUp(){
     User u = new User();
     u.setName("SetupUser");
@@ -35,7 +32,7 @@ public class UserRepositoryTest {
 
     }
 
-    @After
+    @AfterEach
     public void tearDown(){
         repository.deleteAll();
     }
@@ -45,7 +42,7 @@ public class UserRepositoryTest {
         User u = new User();
         u.setName("Test");
         u.setPassword("123456");
-        u.setEmail(EMAIL);
+        u.setEmail("eles@teste.com");
 
         User response = repository.save(u);
 
