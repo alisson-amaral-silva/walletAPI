@@ -51,4 +51,9 @@ public class WalletItemServiceImpl implements WalletItemService {
     public BigDecimal sumByWalletId(Long wallet) {
         return repository.sumByWalletId(wallet);
     }
+
+    @Override
+    public void deleteById(Long id) {
+        repository.deleteById(id);
+    }
 }

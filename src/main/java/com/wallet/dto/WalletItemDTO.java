@@ -1,5 +1,6 @@
 package com.wallet.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
@@ -13,6 +14,7 @@ public class WalletItemDTO {
     @NotNull(message = "Insira o id da carteira")
     private Long wallet;
     @NotNull(message = "Informe a data")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy", locale = "pt-BR", timezone = "Brazil/East")
     private Date date;
     @NotNull(message = "Informe o tipo da carteira")
     @Pattern(regexp = "^(ENTRADA|SAÍDA)$", message = "Para o tipo, somente será aceito ENTRADA ou SAÍDA")
