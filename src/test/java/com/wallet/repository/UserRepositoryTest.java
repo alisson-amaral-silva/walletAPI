@@ -18,7 +18,6 @@ public class UserRepositoryTest {
     public static final String EMAIL = "email@teste.com";
     static final Logger LOG = LoggerFactory.getLogger(UserRepository.class);
 
-
     @Autowired
     UserRepository repository;
 
