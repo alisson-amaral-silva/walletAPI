@@ -6,7 +6,7 @@ jdk:
 addons:
   postgresql: "9.5"
 before_script:
-  - psql -c "create database postgres;" -U postgres // your database name
+  - psql -c "create database postgres;" -U postgres
   - sudo -u postgres psql -c "ALTER ROLE postgres WITH password 'g'"
 before_install:
   - export TZ=Brazil/East
