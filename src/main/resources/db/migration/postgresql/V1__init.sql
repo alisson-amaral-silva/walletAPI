@@ -23,5 +23,4 @@ users integer,
 type varchar(2),
 description varchar(500),
 value numeric (10,2),
-date date,
 foreign key(wallet) references wallet(id));
