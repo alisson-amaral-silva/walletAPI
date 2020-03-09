@@ -12,5 +12,7 @@ before_install:
 deploy:
   provider: heroku
   api_key:
-    - secure: $SECURE_KEY
-  app: $APP
+    secure: 3214184f-10d8-43e1-ac11-54b371913f56
+  app: walletAPI
+  on:
+    repo: alisson-amaral-silva/walletAPI
