@@ -12,6 +12,7 @@ import com.wallet.util.enums.TypeEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -79,6 +80,7 @@ public class WalletItemController {
     }
 
     @GetMapping(value = "/type/{wallet}")
+    @Cacheable(value = "findByWalletIdAndType")
     public ResponseEntity<Response<List<WalletItemDTO>>> findByWalletIdAndType(@PathVariable("wallet") Long wallet,
                                                                                @RequestParam("type") String type) {
 
