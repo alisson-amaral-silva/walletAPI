@@ -29,7 +29,6 @@ public class UserRepositoryTest {
     u.setPassword("Senha 123");
     u.setEmail(EMAIL);
     repository.save(u);
-
     }
 
     @AfterEach
