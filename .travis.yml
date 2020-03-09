@@ -12,7 +12,7 @@ before_install:
 deploy:
   provider: heroku
   api_key:
-    secure: 3214184f-10d8-43e1-ac11-54b371913f56
+    secure: a1c59547-3521-4d2b-8895-2f64c3c15725
   app: api-wallet-test
   on:
     repo: alisson-amaral-silva/walletAPI
