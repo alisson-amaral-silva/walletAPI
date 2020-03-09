@@ -16,8 +16,8 @@ import org.junit.runner.RunWith;
 import org.mockito.BDDMockito;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -40,49 +40,51 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
-//@SpringBootTest
+@SpringBootTest
 @AutoConfigureMockMvc
-@DataJpaTest
 @ActiveProfiles("test")
 public class WalletItemControllerTest {
 
     @MockBean
     WalletItemService service;
     @MockBean
-    UserWalletService userWalletService;;
+    UserWalletService userWalletService;
     @MockBean
     UserService userService;
 
     @Autowired
     MockMvc mvc;
 
-    public static final Long ID = 1L;
-    public static final Date DATE = new Date();
-    public static final LocalDate TODAY = LocalDate.now();
-    public static final TypeEnum TYPE = TypeEnum.EN;
-    public static final String DESCRIPTION = "Descrição";
-    public static final BigDecimal VALUE = BigDecimal.valueOf(100);
-    public static final String URL = "/wallet-item";
+    private static final Long ID = 1L;
+    private static final Date DATE = new Date();
+    private static final LocalDate TODAY = LocalDate.now();
+    private static final TypeEnum TYPE = TypeEnum.EN;
+    private static final String DESCRIPTION = "Conta de Luz";
+    private static final BigDecimal VALUE = BigDecimal.valueOf(65);
+    private static final String URL = "/wallet-item";
 
     @Test
     @WithMockUser
-    public void testSave() throws Exception{
+    public void testSave() throws Exception {
+
         BDDMockito.given(service.save(Mockito.any(WalletItem.class))).willReturn(getMockWalletItem());
+
         mvc.perform(MockMvcRequestBuilders.post(URL).content(getJsonPayload())
-        .contentType(MediaType.APPLICATION_JSON)
-        .accept(MediaType.APPLICATION_JSON)
-        ).andExpect(status().isCreated())
-        .andExpect(jsonPath("$.data.id").value(ID))
-        .andExpect(jsonPath("$.data.date").value(TODAY.format(getDateFormater())))
-        .andExpect(jsonPath("$.data.description").value(DESCRIPTION))
-        .andExpect(jsonPath("$.data.type").value(TYPE.getValue()))
-        .andExpect(jsonPath("$.data.value").value(VALUE))
-        .andExpect(jsonPath("$.data.wallet").value(ID));
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.data.id").value(ID))
+                .andExpect(jsonPath("$.data.date").value(TODAY.format(getDateFormater())))
+                .andExpect(jsonPath("$.data.description").value(DESCRIPTION))
+                .andExpect(jsonPath("$.data.type").value(TYPE.getValue()))
+                .andExpect(jsonPath("$.data.value").value(VALUE))
+                .andExpect(jsonPath("$.data.wallet").value(ID));
+
     }
 
     @Test
     @WithMockUser
-    public void findBetweenDates() throws Exception{
+    public void testFindBetweenDates() throws Exception {
         List<WalletItem> list = new ArrayList<>();
         list.add(getMockWalletItem());
         Page<WalletItem> page = new PageImpl(list);
@@ -93,31 +95,11 @@ public class WalletItemControllerTest {
         User user = new User();
         user.setId(1L);
 
-        BDDMockito.given(service.findBetweenDates(Mockito.anyLong(), Mockito.any(Date.class),  Mockito.any(Date.class), Mockito.anyInt())).willReturn(page);
+        BDDMockito.given(service.findBetweenDates(Mockito.anyLong(), Mockito.any(Date.class), Mockito.any(Date.class), Mockito.anyInt())).willReturn(page);
         BDDMockito.given(userService.findByEmail(Mockito.anyString())).willReturn(Optional.of(user));
         BDDMockito.given(userWalletService.findByUsersIdAndWalletId(Mockito.anyLong(), Mockito.anyLong())).willReturn(Optional.of(new UserWallet()));
 
-        mvc.perform(MockMvcRequestBuilders.get(URL+"/1?startDate="+ startDate+ "&endDate"+ endDate)
-        .contentType(MediaType.APPLICATION_JSON)
-        .accept(MediaType.APPLICATION_JSON))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$.data.content[0].id").value(ID))
-        .andExpect(jsonPath("$.data.content[0].date").value(TODAY.format(getDateFormater())))
-        .andExpect(jsonPath("$.data.content[0].description").value(DESCRIPTION))
-        .andExpect(jsonPath("$.data.content[0].type").value(TYPE.getValue()))
-        .andExpect(jsonPath("$.data.content[0].value").value(VALUE))
-        .andExpect(jsonPath("$.data.content[0].wallet").value(ID));
-    }
-
-    @Test
-    @WithMockUser
-    public void testFindByType() throws Exception{
-        List<WalletItem> list = new ArrayList<>();
-        list.add(getMockWalletItem());
-
-        BDDMockito.given(service.findByWalletIdAndType(Mockito.anyLong(),Mockito.any(TypeEnum.class))).willReturn(list);
-
-        mvc.perform(MockMvcRequestBuilders.get(URL+"/type/1?type=ENTRADA")
+        mvc.perform(MockMvcRequestBuilders.get(URL + "/1?startDate=" + startDate + "&endDate=" + endDate)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -127,33 +109,72 @@ public class WalletItemControllerTest {
                 .andExpect(jsonPath("$.data.content[0].type").value(TYPE.getValue()))
                 .andExpect(jsonPath("$.data.content[0].value").value(VALUE))
                 .andExpect(jsonPath("$.data.content[0].wallet").value(ID));
+
     }
 
     @Test
     @WithMockUser
-    public void testUpdate() throws Exception{
+    public void testFindByType() throws Exception {
+        List<WalletItem> list = new ArrayList<>();
+        list.add(getMockWalletItem());
+
+        BDDMockito.given(service.findByWalletIdAndType(Mockito.anyLong(), Mockito.any(TypeEnum.class))).willReturn(list);
+
+        mvc.perform(MockMvcRequestBuilders.get(URL+"/type/1?type=ENTRADA")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.[0].id").value(ID))
+                .andExpect(jsonPath("$.data.[0].date").value(TODAY.format(getDateFormater())))
+                .andExpect(jsonPath("$.data.[0].description").value(DESCRIPTION))
+                .andExpect(jsonPath("$.data.[0].type").value(TYPE.getValue()))
+                .andExpect(jsonPath("$.data.[0].value").value(VALUE))
+                .andExpect(jsonPath("$.data.[0].wallet").value(ID));
+
+    }
+
+    @Test
+    @WithMockUser
+    public void testSumByWallet() throws Exception {
+        BigDecimal value = BigDecimal.valueOf(536.90);
+
+        BDDMockito.given(service.sumByWalletId(Mockito.anyLong())).willReturn(value);
+
+        mvc.perform(MockMvcRequestBuilders.get(URL+"/total/1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data").value("536.9"));
+
+    }
+
+    @Test
+    @WithMockUser
+    public void testUpdate() throws Exception {
+
         String description = "Nova descrição";
         Wallet w = new Wallet();
         w.setId(ID);
 
         BDDMockito.given(service.findById(Mockito.anyLong())).willReturn(Optional.of(getMockWalletItem()));
-        BDDMockito.given(service.save(Mockito.any(WalletItem.class))).willReturn(new WalletItem(1L, w, TypeEnum.SD, description, VALUE,DATE));
+        BDDMockito.given(service.save(Mockito.any(WalletItem.class))).willReturn(new WalletItem(1L, w, TypeEnum.SD, description, VALUE, DATE));
 
-        mvc.perform(MockMvcRequestBuilders.put(URL)
+        mvc.perform(MockMvcRequestBuilders.put(URL).content(getJsonPayload())
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.content[0].id").value(ID))
-                .andExpect(jsonPath("$.data.content[0].date").value(TODAY.format(getDateFormater())))
-                .andExpect(jsonPath("$.data.content[0].description").value(description))
-                .andExpect(jsonPath("$.data.content[0].type").value(TypeEnum.SD.getValue()))
-                .andExpect(jsonPath("$.data.content[0].value").value(VALUE))
-                .andExpect(jsonPath("$.data.content[0].wallet").value(ID));
+                .andExpect(jsonPath("$.data.id").value(ID))
+                .andExpect(jsonPath("$.data.date").value(TODAY.format(getDateFormater())))
+                .andExpect(jsonPath("$.data.description").value(description))
+                .andExpect(jsonPath("$.data.type").value(TypeEnum.SD.getValue()))
+                .andExpect(jsonPath("$.data.value").value(VALUE))
+                .andExpect(jsonPath("$.data.wallet").value(ID));
+
     }
 
     @Test
     @WithMockUser
-    public void testUpdateWalletChange() throws Exception{
+    public void testUpdateWalletChange() throws Exception {
 
         Wallet w = new Wallet();
         w.setId(99L);
@@ -162,42 +183,47 @@ public class WalletItemControllerTest {
 
         BDDMockito.given(service.findById(Mockito.anyLong())).willReturn(Optional.of(wi));
 
-        mvc.perform(MockMvcRequestBuilders.put(URL)
+        mvc.perform(MockMvcRequestBuilders.put(URL).content(getJsonPayload())
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.data").doesNotExist())
-                .andExpect(jsonPath("$.errors[0]").value("Você não pode alterar a wallet"));
+                .andExpect(jsonPath("$.errors[0]").value("Você não pode alterar a carteira"));
+
     }
 
     @Test
     @WithMockUser
-    public void testUpdateInvalid() throws Exception{
+    public void testUpdateInvalidId() throws Exception {
+
         BDDMockito.given(service.findById(Mockito.anyLong())).willReturn(Optional.empty());
 
-        mvc.perform(MockMvcRequestBuilders.put(URL)
+        mvc.perform(MockMvcRequestBuilders.put(URL).content(getJsonPayload())
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.data").doesNotExist())
                 .andExpect(jsonPath("$.errors[0]").value("WalletItem não encontrado"));
+
     }
 
     @Test
-    @WithMockUser
-    public void testDelete() throws Exception{
+    @WithMockUser(username = "admin@admin.com", roles = {"ADMIN"})
+    public void testDelete() throws JsonProcessingException, Exception {
+
         BDDMockito.given(service.findById(Mockito.anyLong())).willReturn(Optional.of(new WalletItem()));
 
         mvc.perform(MockMvcRequestBuilders.delete(URL+"/1")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data").value("Carteira de id "+ID+ "foi apagado com sucesso"));
+                .andExpect(jsonPath("$.data").value("WalletItem de id "+ ID +" apagada com sucesso"));
     }
 
     @Test
-    @WithMockUser
-    public void testDeleteInvalid() throws  Exception{
+    @WithMockUser(username = "admin@admin.com", roles = {"ADMIN"})
+    public void testDeleteInvalid() throws Exception {
+
         BDDMockito.given(service.findById(Mockito.anyLong())).willReturn(Optional.empty());
 
         mvc.perform(MockMvcRequestBuilders.delete(URL+"/99")
@@ -205,10 +231,11 @@ public class WalletItemControllerTest {
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.data").doesNotExist())
-                .andExpect(jsonPath("$.errors[0]").value("Carteira de id"+ 99+"não encontrada"));
+                .andExpect(jsonPath("$.errors[0]").value("WalletItem de id "+ 99 + " não encontrada"));
+
     }
 
-    private WalletItem getMockWalletItem(){
+    private WalletItem getMockWalletItem() {
         Wallet w = new Wallet();
         w.setId(1L);
 
@@ -216,7 +243,7 @@ public class WalletItemControllerTest {
         return wi;
     }
 
-    private String getJsonPayload() throws JsonProcessingException {
+    public String getJsonPayload() throws JsonProcessingException {
         WalletItemDTO dto = new WalletItemDTO();
         dto.setId(ID);
         dto.setDate(DATE);
@@ -229,7 +256,7 @@ public class WalletItemControllerTest {
         return mapper.writeValueAsString(dto);
     }
 
-    private DateTimeFormatter getDateFormater(){
+    private DateTimeFormatter getDateFormater() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
         return formatter;
     }

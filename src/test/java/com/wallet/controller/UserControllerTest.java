@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wallet.dto.UserDTO;
 import com.wallet.entity.User;
 import com.wallet.service.UserService;
+import com.wallet.util.enums.RoleEnum;
 import org.junit.jupiter.api.Test;
 import org.mockito.BDDMockito;
 import org.mockito.Mockito;
@@ -13,7 +14,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
@@ -22,7 +22,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@ActiveProfiles("test")
 public class UserControllerTest {
     private static final Long ID = 1L;
     private static final String EMAIL="email@teste.com";
@@ -47,7 +46,9 @@ public class UserControllerTest {
         .andExpect(jsonPath("$.data.id").value(ID))
         .andExpect(jsonPath("$.data.email").value(EMAIL))
         .andExpect(jsonPath("$.data.password").doesNotExist())
-        .andExpect(jsonPath("$.data.name").value(NAME));
+        .andExpect(jsonPath("$.data.name").value(NAME))
+        .andExpect(jsonPath("$.data.role").value(RoleEnum.ROLE_ADMIN.toString()));
+
 
     }
 
@@ -66,6 +67,7 @@ public class UserControllerTest {
         u.setName(NAME);
         u.setPassword(PASSWORD);
         u.setEmail(EMAIL);
+        u.setRole(RoleEnum.ROLE_ADMIN);
         return u;
     }
 
@@ -75,6 +77,7 @@ public class UserControllerTest {
         dto.setName(name);
         dto.setPassword(password);
         dto.setEmail(email);
+        dto.setRole(RoleEnum.ROLE_ADMIN.toString());
         ObjectMapper mapper = new ObjectMapper();
         return mapper.writeValueAsString(dto);
     }
